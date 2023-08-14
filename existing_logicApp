@@ -1,0 +1,80 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Create_a_pipeline_run": {
+                "inputs": {
+                    "body": {
+                        "FileName": "@{triggerBody()?['{FilenameWithExtension}']}",
+                        "FilePath": "@{triggerBody()?['{Path}']}",
+                        "PipelineName": "pl_sharepoint"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azuredatafactory_1']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/subscriptions/@{encodeURIComponent('cf488406-af15-4248-898e-11932611df2b')}/resourcegroups/@{encodeURIComponent('pep-cdo-huron-dev-eus-01-rg')}/providers/Microsoft.DataFactory/factories/@{encodeURIComponent('cdo-dev-datafdn-de02-adf')}/pipelines/@{encodeURIComponent('pl_master')}/CreateRun",
+                    "queries": {
+                        "x-ms-api-version": "2017-09-01-preview"
+                    }
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "When_a_file_is_created_or_modified_(properties_only)": {
+                "evaluatedRecurrence": {
+                    "frequency": "Second",
+                    "interval": 10
+                },
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['sharepointonline_1']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://pepsico.sharepoint.com/sites/EDF-FileUpload-Dev-FileUpload/'))}/tables/@{encodeURIComponent(encodeURIComponent('a6d8d321-01e2-49d6-8b8b-4478a61a8835'))}/onupdatedfileitems"
+                },
+                "recurrence": {
+                    "frequency": "Second",
+                    "interval": 10
+                },
+                "splitOn": "@triggerBody()?['value']",
+                "type": "ApiConnection"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azuredatafactory_1": {
+                    "connectionId": "/subscriptions/cf488406-af15-4248-898e-11932611df2b/resourceGroups/pep-cdo-huron-dev-eus-01-rg/providers/Microsoft.Web/connections/azuredatafactory-1",
+                    "connectionName": "azuredatafactory-1",
+                    "connectionProperties": {
+                        "authentication": {
+                            "type": "ManagedServiceIdentity"
+                        }
+                    },
+                    "id": "/subscriptions/cf488406-af15-4248-898e-11932611df2b/providers/Microsoft.Web/locations/eastus/managedApis/azuredatafactory"
+                },
+                "sharepointonline_1": {
+                    "connectionId": "/subscriptions/cf488406-af15-4248-898e-11932611df2b/resourceGroups/pep-cdo-huron-dev-eus-01-rg/providers/Microsoft.Web/connections/sharepointonline",
+                    "connectionName": "sharepointonline",
+                    "id": "/subscriptions/cf488406-af15-4248-898e-11932611df2b/providers/Microsoft.Web/locations/eastus/managedApis/sharepointonline"
+                }
+            }
+        }
+    }
+}
